@@ -436,8 +436,12 @@ document.getElementById("syncBtn").addEventListener("click", async function () {
   showToast("⏳ 正在同步到 GitHub...");
 
   try {
-    var url = await syncToGitHub(editing, faqEditing);
-    showToast("✓ 已同步！刷新其他设备即可看到更新");
+    var newVersion = (typeof DATA_VERSION !== "undefined" ? DATA_VERSION : 0) + 1;
+    var url = await syncToGitHub(editing, faqEditing, newVersion);
+    localStorage.setItem("prismx_data_version", String(newVersion));
+    localStorage.removeItem("prismx_accounts_v1");
+    localStorage.removeItem("prismx_faq_v1");
+    showToast("✓ 已同步！刷新其他设备即可看到更新（版本 " + newVersion + "）");
   } catch (e) {
     console.error("GitHub sync error:", e);
     showToast("同步失败: " + e.message);

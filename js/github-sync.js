@@ -24,13 +24,16 @@ function hasGitHubToken() {
 }
 
 /* 构建完整的 data.js 文件内容 */
-function buildDataJS(accounts, faq) {
+function buildDataJS(accounts, faq, version) {
+  version = version || 1;
   var header =
     "/* ============================================================\n" +
     "   PRISM X · 数据（由管理控制台导出）\n" +
     "   导出时间：" + new Date().toLocaleString() + "\n" +
+    "   数据版本：" + version + "\n" +
     "   本文件由管理后台自动推送至 GitHub。\n" +
     "   ============================================================ */\n\n" +
+    "const DATA_VERSION = " + version + ";\n" +
     'const PRISM_STORAGE_KEY = "prismx_accounts_v1";\n\n' +
     "const DEFAULT_ACCOUNTS = ";
   var mid =
@@ -79,11 +82,11 @@ function buildDataJS(accounts, faq) {
 }
 
 /* 同步到 GitHub */
-async function syncToGitHub(accounts, faq) {
+async function syncToGitHub(accounts, faq, version) {
   var token = getGitHubToken();
   if (!token) throw new Error("请先设置 GitHub Token");
 
-  var content = buildDataJS(accounts, faq);
+  var content = buildDataJS(accounts, faq, version);
   var contentB64 = btoa(unescape(encodeURIComponent(content)));
   var apiBase = "https://api.github.com/repos/" + GH_OWNER + "/" + GH_REPO;
 

@@ -302,6 +302,18 @@
     }).join("");
   }
 
+  /* 跨设备自动同步：对比版本号，远程更新时自动清除本地缓存 */
+  (function () {
+    var key = "prismx_data_version";
+    var localVersion = 0;
+    try { localVersion = Number(localStorage.getItem(key)) || 0; } catch (e) { }
+    if (typeof DATA_VERSION !== "undefined" && DATA_VERSION > localVersion) {
+      localStorage.removeItem("prismx_accounts_v1");
+      localStorage.removeItem("prismx_faq_v1");
+      localStorage.setItem(key, String(DATA_VERSION));
+    }
+  })();
+
   renderAccounts();
 
   /* ---------- 渲染 FAQ ---------- */
