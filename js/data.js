@@ -1,6 +1,6 @@
 /* ============================================================
    PRISM X · 数据（由管理控制台导出）
-   导出时间：6/16/2026, 12:32:49 AM
+   导出时间：6/16/2026, 12:36:05 AM
    本文件由管理后台自动推送至 GitHub。
    ============================================================ */
 
@@ -19,6 +19,20 @@ const DEFAULT_ACCOUNTS = [
     "annualReturn": 19.4,
     "maxDrawdown": 6.8,
     "description": "以稳定为第一需求的旗舰策略，优先控制回撤，适合追求长期复利的投资者。",
+    "link": ""
+  },
+  {
+    "id": "acct-1781541344065",
+    "name": "新账户",
+    "strategy": "1111",
+    "status": "running",
+    "broker": "Make Capital",
+    "startDate": "2026-06-15",
+    "balance": "48,200 USD",
+    "totalReturn": 55,
+    "annualReturn": 556,
+    "maxDrawdown": 0,
+    "description": "",
     "link": ""
   }
 ];
