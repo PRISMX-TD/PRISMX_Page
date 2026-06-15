@@ -494,29 +494,37 @@
     </p>
   </footer>
 
-  <script src="js/data.js"></script>
-  <script src="js/background.js"></script>
-  <script src="js/main.js"></script>
   <script>
-    /* 连续点击 phil-wave 5 次显示管理入口 */
-    (function () {
-      var clicks = 0;
-      var timer = null;
-      var philWave = document.querySelector('.phil-wave');
-      var adminLink = document.querySelector('.nav-admin');
-      if (!philWave || !adminLink) return;
-      philWave.style.cursor = 'default';
-      philWave.addEventListener('click', function () {
-        clicks++;
-        clearTimeout(timer);
-        if (clicks >= 5) {
-          adminLink.classList.remove('hidden');
-          clicks = 0;
-        } else {
-          timer = setTimeout(function () { clicks = 0; }, 2000);
-        }
+    /* 动态加载 data.js（带时间戳绕过缓存），确保每次刷新都能拿到最新版本 */
+    function loadJS(src, cb) {
+      var s = document.createElement("script");
+      s.src = src;
+      s.onload = cb || function () {};
+      document.head.appendChild(s);
+    }
+    loadJS("js/data.js?t=" + Date.now(), function () {
+      loadJS("js/background.js", function () {
+        loadJS("js/main.js", function () {
+          /* 连续点击 phil-wave 5 次显示管理入口 */
+          var clicks = 0, timer = null;
+          var philWave = document.querySelector(".phil-wave");
+          var adminLink = document.querySelector(".nav-admin");
+          if (philWave && adminLink) {
+            philWave.style.cursor = "default";
+            philWave.addEventListener("click", function () {
+              clicks++;
+              clearTimeout(timer);
+              if (clicks >= 5) {
+                adminLink.classList.remove("hidden");
+                clicks = 0;
+              } else {
+                timer = setTimeout(function () { clicks = 0; }, 2000);
+              }
+            });
+          }
+        });
       });
-    })();
+    });
   </script>
 </body>
 </html>
