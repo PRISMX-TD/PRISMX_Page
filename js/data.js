@@ -1,6 +1,6 @@
 /* ============================================================
    PRISM X · 数据（由管理控制台导出）
-   导出时间：6/16/2026, 1:21:54 AM
+   导出时间：6/16/2026, 1:21:59 AM
    数据版本：2
    本文件由管理后台自动推送至 GitHub。
    ============================================================ */
@@ -11,7 +11,7 @@ const PRISM_STORAGE_KEY = "prismx_accounts_v1";
 const DEFAULT_ACCOUNTS = [
   {
     "id": "acct-aurora",
-    "name": "Aurora · 高稳定型",
+    "name": "Aurora · 高稳定型112",
     "strategy": "PRISM-STABLE EA v3.2",
     "status": "running",
     "broker": "Make Capital",
