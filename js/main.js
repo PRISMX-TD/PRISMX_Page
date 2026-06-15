@@ -302,16 +302,40 @@
     }).join("");
   }
 
-  /* 跨设备自动同步：对比版本号，远程更新时自动清除本地缓存 */
+  /* 跨设备自动同步：主动拉取最新版本号（绕过浏览器缓存） */
   (function () {
-    var key = "prismx_data_version";
-    var localVersion = 0;
-    try { localVersion = Number(localStorage.getItem(key)) || 0; } catch (e) { }
-    if (typeof DATA_VERSION !== "undefined" && DATA_VERSION > localVersion) {
+    var verKey = "prismx_data_version";
+    var localVer = 0;
+    try { localVer = Number(localStorage.getItem(verKey)) || 0; } catch (e) { }
+
+    /* 先尝试用已加载的 data.js 快速比较 */
+    if (typeof DATA_VERSION !== "undefined" && DATA_VERSION > localVer) {
       localStorage.removeItem("prismx_accounts_v1");
       localStorage.removeItem("prismx_faq_v1");
-      localStorage.setItem(key, String(DATA_VERSION));
+      localStorage.setItem(verKey, String(DATA_VERSION));
     }
+
+    /* 再发网络请求拉最新 data.js（加时间戳绕过缓存），确保不遗漏远程更新 */
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "js/data.js?t=" + Date.now(), true);
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var m = xhr.responseText.match(/const DATA_VERSION\s*=\s*(\d+)/);
+        if (m) {
+          var remoteVer = parseInt(m[1], 10);
+          if (remoteVer > localVer) {
+            localStorage.removeItem("prismx_accounts_v1");
+            localStorage.removeItem("prismx_faq_v1");
+            localStorage.setItem(verKey, String(remoteVer));
+            /* 如果本机已显示旧数据，刷新即可看到最新 */
+            if (document.getElementById("accountsGrid")) {
+              location.reload();
+            }
+          }
+        }
+      }
+    };
+    xhr.send();
   })();
 
   renderAccounts();
