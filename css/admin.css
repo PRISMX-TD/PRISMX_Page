@@ -1,0 +1,202 @@
+/* ============================================================
+   PRISM X · 管理员页面样式（基于 style.css 之上）
+   ============================================================ */
+
+body.admin-body { min-height: 100vh; }
+
+.admin-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 110px 24px 80px;
+}
+
+/* ---------- 登录 ---------- */
+.login-card {
+  max-width: 420px;
+  margin: 12vh auto 0;
+  background: linear-gradient(180deg, rgba(18, 18, 31, 0.8), rgba(13, 13, 23, 0.6));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 44px 40px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+.login-card .brand-mark { width: 44px; height: 44px; margin-bottom: 18px; }
+.login-card h1 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.login-card .sub { font-size: 13px; color: var(--text-faint); margin-bottom: 30px; letter-spacing: 0.1em; }
+.field { text-align: left; margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 7px;
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  background: rgba(6, 6, 10, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 11px 14px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--violet-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+.field textarea { resize: vertical; min-height: 70px; line-height: 1.7; }
+.login-error {
+  color: #f87171;
+  font-size: 13px;
+  min-height: 20px;
+  margin-bottom: 10px;
+}
+.btn-block { width: 100%; justify-content: center; }
+.login-hint { margin-top: 22px; font-size: 12px; color: var(--text-faint); line-height: 1.8; }
+.login-hint code {
+  font-family: var(--font-mono);
+  color: var(--violet-300);
+  background: rgba(139, 92, 246, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ---------- 控制台 ---------- */
+.admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.admin-head h1 {
+  font-size: 26px;
+  font-weight: 600;
+}
+.admin-head h1 span {
+  font-family: var(--font-mono);
+  display: block;
+  font-size: 12px;
+  color: var(--violet-400);
+  letter-spacing: 0.2em;
+  margin-bottom: 8px;
+}
+.admin-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-sm { padding: 9px 18px; font-size: 13px; }
+.btn-danger { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
+.btn-danger:hover { border-color: #f87171; background: rgba(248, 113, 113, 0.08); }
+
+.admin-tip {
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--violet-500);
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.9;
+  margin-bottom: 34px;
+}
+.admin-tip b { color: var(--violet-300); }
+
+.acct-editor {
+  background: linear-gradient(180deg, rgba(18, 18, 31, 0.7), rgba(13, 13, 23, 0.5));
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 22px;
+}
+.acct-editor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  gap: 12px;
+}
+.acct-editor-head h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--violet-300);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+.editor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 18px;
+}
+.editor-grid .span-3 { grid-column: 1 / -1; }
+.editor-grid .span-2 { grid-column: span 2; }
+
+.save-bar {
+  position: sticky;
+  bottom: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+  z-index: 5;
+}
+.save-bar .btn { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+
+.toast {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(18, 18, 31, 0.95);
+  border: 1px solid var(--violet-500);
+  color: var(--violet-300);
+  font-size: 14px;
+  padding: 12px 26px;
+  border-radius: 100px;
+  opacity: 0;
+  transition: transform 0.35s, opacity 0.35s;
+  z-index: 100;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.hidden { display: none !important; }
+
+@media (max-width: 760px) {
+  .editor-grid { grid-template-columns: 1fr; }
+  .editor-grid .span-2, .editor-grid .span-3 { grid-column: 1; }
+  .admin-wrap { padding: 96px 18px 60px; }
+  .login-card { max-width: 100%; margin: 8vh 16px 0; padding: 36px 28px; }
+  .admin-head { flex-direction: column; align-items: flex-start; }
+  .admin-head h1 { font-size: 22px; }
+  .acct-editor { padding: 20px 16px; }
+  .acct-editor-head { flex-direction: column; align-items: flex-start; }
+  .save-bar { bottom: 10px; }
+  .btn-sm { font-size: 12px; padding: 8px 14px; }
+}
+
+@media (max-width: 480px) {
+  .admin-wrap { padding: 88px 12px 48px; }
+  .login-card { padding: 28px 18px; border-radius: 12px; }
+  .login-card h1 { font-size: 18px; }
+  .login-card .sub { font-size: 12px; }
+  .login-card .brand-mark { width: 36px; height: 36px; }
+  .admin-head h1 { font-size: 20px; }
+  .admin-actions { width: 100%; }
+  .admin-actions .btn { flex: 1; text-align: center; }
+  .admin-tip { padding: 14px 16px; font-size: 12px; }
+  .acct-editor { padding: 16px 12px; border-radius: 12px; margin-bottom: 16px; }
+  .acct-editor-head h2 { font-size: 14px; }
+  .field input, .field textarea, .field select { font-size: 13px; padding: 10px 12px; }
+  .field label { font-size: 11px; }
+  .toast { font-size: 12px; padding: 10px 20px; }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理控制台 · PRISM X 棱镜量化</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    body { background: #06060a; color: #eceaf6; font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; }
+    .css-probe { position: absolute; visibility: hidden; }
+  </style>
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      var probe = document.createElement("div");
+      probe.className = "css-probe";
+      document.body.appendChild(probe);
+      var ok = getComputedStyle(probe).height === "7px";
+      probe.remove();
+      if (!ok) {
+        var bar = document.createElement("div");
+        bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#7c3aed;color:#fff;padding:14px 20px;font-size:14px;line-height:1.7;text-align:center;";
+        bar.innerHTML = "⚠️ 样式文件（css/style.css）未能加载。请先把压缩包<b>完整解压</b>，保持 css/ 和 js/ 文件夹与本页面在同一目录后再打开。";
+        document.body.prepend(bar);
+      }
+    });
+  </script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 L28 26 L4 26 Z' fill='none' stroke='%23a78bfa' stroke-width='2'/%3E%3C/svg%3E" />
+</head>
+<body class="admin-body">
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-glow bg-glow--a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--b" aria-hidden="true"></div>
+
+  <header class="nav scrolled">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        </svg>
+        <span class="brand-name">PRISM <em>X</em></span>
+        <span class="brand-cn">管理控制台</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">← 返回主页</a>
+        <a href="#" id="logoutBtn" class="nav-admin hidden">退出登录</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="admin-wrap">
+
+    <!-- 登录界面 -->
+    <section id="loginView">
+      <div class="login-card">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        </svg>
+        <h1>ADMIN ACCESS</h1>
+        <p class="sub">输入管理员密码以编辑账户追踪数据</p>
+        <div class="field">
+          <label for="pwInput">管理员密码</label>
+          <input type="password" id="pwInput" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <p class="login-error" id="loginError"></p>
+        <button class="btn btn-primary btn-block" id="loginBtn">登录</button>
+      </div>
+    </section>
+
+    <!-- 控制台 -->
+    <section id="dashView" class="hidden">
+      <div class="admin-head">
+        <h1><span>ACCOUNT TRACKING / EDITOR</span>账户追踪管理</h1>
+        <div class="admin-actions">
+          <button class="btn btn-ghost btn-sm" id="addBtn">+ 新增账户</button>
+          <button class="btn btn-ghost btn-sm" id="exportBtn">导出 data.js</button>
+          <button class="btn btn-danger btn-sm btn-ghost" id="resetBtn">恢复默认</button>
+        </div>
+      </div>
+
+      <div class="admin-tip" id="githubConfig">
+        <b>GitHub 同步：</b>输入你的 Token 后点击「保存并同步到 GitHub」，所有设备刷新即可看到更新。
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxx" style="flex:1;min-width:200px;padding:9px 12px;background:rgba(0,0,0,.3);border:1px solid var(--violet-700);border-radius:6px;color:#e0e0e0;font-family:var(--font-mono);font-size:13px;" />
+          <button class="btn btn-ghost btn-sm" id="ghSaveTokenBtn">设置 Token</button>
+          <button class="btn btn-ghost btn-sm" id="ghClearTokenBtn" style="color:var(--error);">清除</button>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-faint);" id="ghStatus">未设置 Token</div>
+      </div>
+
+      <div id="editorList"><!-- 账户编辑卡片由 js/admin.js 渲染 --></div>
+
+      <div class="admin-head" style="margin-top:50px">
+        <h1><span>FAQ EDITOR</span>常见问题管理</h1>
+        <div class="admin-actions">
+          <button class="btn btn-ghost btn-sm" id="addFaqBtn">+ 新增问题</button>
+          <button class="btn btn-danger btn-sm btn-ghost" id="resetFaqBtn">恢复默认FAQ</button>
+        </div>
+      </div>
+      <div id="faqEditorList"><!-- FAQ 编辑卡片由 js/admin.js 渲染 --></div>
+
+      <div class="save-bar">
+        <button class="btn btn-primary" id="saveBtn">保存到浏览器</button>
+        <button class="btn btn-primary" id="syncBtn" style="background:var(--violet-700);border-color:var(--violet-600);">保存并同步到 GitHub</button>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/github-sync.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

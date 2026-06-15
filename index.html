@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRISM X · 棱镜量化 — 算法交易 / 量化策略</title>
+  <meta name="description" content="PRISM X 棱镜量化：以精准、风险优先、智能、稳健、多策略为核心理念的量化交易团队。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Poppins:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- 兜底样式：即使外部 CSS 加载失败，也保持深色可读 -->
+  <style>
+    body { background: #06060a; color: #eceaf6; font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; }
+    .css-probe { position: absolute; visibility: hidden; }
+  </style>
+  <script>
+    /* 检测 css/style.css 是否成功加载；失败则提示正确的打开方式 */
+    window.addEventListener("DOMContentLoaded", function () {
+      var probe = document.createElement("div");
+      probe.className = "css-probe";
+      document.body.appendChild(probe);
+      var ok = getComputedStyle(probe).height === "7px"; /* style.css 中定义 */
+      probe.remove();
+      if (!ok) {
+        var bar = document.createElement("div");
+        bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#7c3aed;color:#fff;padding:14px 20px;font-size:14px;line-height:1.7;text-align:center;";
+        bar.innerHTML = "⚠️ 样式文件（css/style.css）未能加载。请先把压缩包<b>完整解压</b>，保持 css/ 和 js/ 文件夹与 index.html 在同一目录，再打开页面。不要直接在压缩包内双击打开。";
+        document.body.prepend(bar);
+      }
+    });
+  </script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 L28 26 L4 26 Z' fill='none' stroke='%23a78bfa' stroke-width='2'/%3E%3C/svg%3E" />  <!-- 转化优化新增组件样式（信任条 / 三步 / FAQ / 联系方式 / 就近风险提示） -->
+  <style>
+    .trust-strip { position: relative; z-index: 1; padding: 34px 24px; }
+    .trust-strip-inner { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); background: linear-gradient(180deg, rgba(18,18,31,.72), rgba(13,13,23,.5)); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(10px); overflow: hidden; }
+    .trust-item { display: flex; align-items: center; gap: 13px; padding: 20px 22px; border-left: 1px solid var(--line-soft); }
+    .trust-item:first-child { border-left: none; }
+    .trust-ico { flex: none; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; color: var(--cyan-300); background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.28); }
+    .trust-ico svg { width: 19px; height: 19px; display: block; }
+    .trust-tx { display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
+    .trust-tx b { font-size: 14.5px; color: var(--text); font-weight: 600; letter-spacing: .01em; }
+    .trust-tx span { font-size: 12px; color: var(--text-faint); }
+    @media (max-width: 900px){
+      .trust-strip-inner { grid-template-columns: repeat(2, 1fr); }
+      .trust-item:nth-child(odd) { border-left: none; }
+      .trust-item:nth-child(n+3) { border-top: 1px solid var(--line-soft); }
+    }
+    @media (max-width: 520px){
+      .trust-strip { padding: 18px 14px; }
+      .trust-strip-inner { grid-template-columns: 1fr; border-radius: 12px; }
+      .trust-item { border-left: none !important; padding: 16px 18px; gap: 10px; }
+      .trust-item:nth-child(n+2) { border-top: 1px solid var(--line-soft); }
+      .trust-ico { width: 32px; height: 32px; border-radius: 8px; }
+      .trust-ico svg { width: 16px; height: 16px; }
+      .trust-tx b { font-size: 13px; }
+      .trust-tx span { font-size: 11px; }
+    }
+
+    .accounts-cta { text-align: center; margin-top: 34px; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .step { position: relative; background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 26px; overflow: hidden; }
+    .step::before { content: ""; position:absolute; top:0; left:0; right:0; height:2px; background: var(--spectrum); transform: scaleX(0); transform-origin:left; transition: transform .6s ease; }
+    .step:hover::before { transform: scaleX(1); }
+    .step-n { font-family: var(--font-mono); font-size: 13px; color: var(--violet-400); letter-spacing:.2em; margin-bottom: 13px; }
+    .step h3 { font-size: 18px; margin-bottom: 10px; color: var(--text); }
+    .step p { font-size: 14px; color: var(--text-dim); line-height: 1.85; }
+    .step strong { color: var(--violet-300); }
+    @media (max-width: 760px){ .steps{ grid-template-columns: 1fr; gap: 14px; } .step{ padding: 24px 20px; } .step h3{ font-size: 16px; } .step p{ font-size: 13px; } }
+
+    .faq { display: grid; gap: 13px; max-width: 860px; margin: 0 auto; }
+    .faq-item { border: 1px solid var(--line); border-radius: 12px; background: rgba(18,18,31,.5); overflow: hidden; }
+    .faq-item summary { list-style: none; cursor: pointer; color: var(--text); font-weight: 600; font-size: 16px; padding: 17px 22px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary .pm { color: var(--violet-400); font-size: 22px; line-height: 1; flex: none; transition: transform .3s; }
+    .faq-item[open] summary .pm { transform: rotate(45deg); }
+    .faq-a-inner { padding: 0 22px 18px; color: var(--text-dim); font-size: 14.5px; line-height: 1.9; }
+    .faq-a-inner strong { color: var(--violet-300); }
+    @media (max-width: 480px){
+      .faq-item summary { font-size: 14px; padding: 15px 16px; }
+      .faq-a-inner { font-size: 13px; padding: 0 16px 16px; line-height: 1.8; }
+    }
+
+    .contact-methods { display: flex; flex-wrap: wrap; justify-content: center; gap: 13px; margin-top: 26px; }
+    .contact-card { display: flex; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 100px; padding: 11px 22px; color: var(--text); text-decoration: none; font-size: 14px; background: rgba(124,58,237,.05); transition: border-color .25s, background .25s, transform .25s; }
+    .contact-card:hover { border-color: var(--violet-500); background: rgba(139,92,246,.1); transform: translateY(-2px); }
+    .contact-card b { color: var(--violet-300); font-family: var(--font-mono); font-weight: 600; }
+    @media (max-width: 480px){
+      .contact-methods { gap: 8px; }
+      .contact-card { padding: 9px 16px; font-size: 12.5px; gap: 8px; }
+      .contact-card b { font-size: 12px; }
+    }
+    @media (max-width: 480px){
+      .cta-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+      .cta-actions .btn { width: 100%; }
+      .cta-trust { gap: 14px; font-size: 11px; }
+      .cta-br { display: none; }
+    }
+
+    .nav-admin.hidden { display: none !important; }
+  </style>
+
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- 可互动背景 -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-glow bg-glow--a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--b" aria-hidden="true"></div>
+
+  <!-- 导航 -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="url(#brandGrad)" stroke-width="2"/>
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7c3aed"/>
+              <stop offset="100%" stop-color="#67e8f9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="brand-name">PRISM <em>X</em></span>
+        <span class="brand-cn">棱镜量化</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <a href="#philosophy">核心理念</a>
+        <a href="#timeline">团队介绍</a>
+        <a href="#accounts">账户追踪</a>
+        <a href="#how">如何开始</a>
+        <a class="nav-admin hidden" href="admin.html">管理入口</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- Hero · G17 边缘环数据（越靠中心越透明）+ 互动粒子 -->
+    <section class="hero hero-g17" id="heroG17">
+      <canvas class="hero-bg" id="heroParticles" aria-hidden="true"></canvas>
+      <canvas class="hero-wall" id="heroWall" aria-hidden="true"></canvas>
+      <div class="hero-vig" aria-hidden="true"></div>
+      <div class="hero-center" id="heroCenter">
+        <span class="hero-eyebrow"><span class="dot"></span>QUANTITATIVE TRADING SYSTEMS</span>
+        <h1>PRISM <span class="x">X</span></h1>
+        <div class="hero-cn">棱镜量化</div>
+        <p class="hero-desc">
+          如同棱镜将白光分解为光谱，我们将复杂的市场数据折射为清晰的交易信号。
+          以算法对抗人性，以纪律驾驭波动。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#accounts">查看实盘账户</a>
+          <a class="btn btn-ghost" href="#philosophy">了解我们的理念</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num"><b data-count="9">0</b>+</div>
+            <div class="lab">年经验</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num"><b data-count="6">0</b>年</div>
+            <div class="lab">深度策略研发</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num"><b>24</b>/5</div>
+            <div class="lab">EA 自动化执行</div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-hint">SCROLL</div>
+    </section>
+
+    <!-- 信任条：把最能建立信任的信号前置 -->
+    <div class="trust-strip" aria-label="信任信息">
+      <div class="trust-strip-inner">
+        <div class="trust-item">
+          <span class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+          <div class="trust-tx"><b>9 年经验 · 6 年实战</b><span>团队长期深耕量化策略</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 7 4-14 3 7h4"/></svg></span>
+          <div class="trust-tx"><b>实盘数据公开追踪</b><span>收益与净值持续更新</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
+          <div class="trust-tx"><b>透明展示回撤与净值</b><span>含完整风险数据</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9.5L12 5l7 4.5V21M9.5 21v-5h5v5"/></svg></span>
+          <div class="trust-tx"><b>Make Capital</b><span>受监管经纪商执行</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 为何算法交易（损失厌恶 × 问题-方案对比） -->
+    <section class="section section-tight" id="why">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">WHY ALGORITHMIC</div>
+          <h2>交易中最贵的成本，是人性<span class="en">EMOTION IS THE MOST EXPENSIVE COST</span></h2>
+          <p>2017 年成立之初我们就确信：情绪化与不确定性，是手动交易最大的瓶颈。</p>
+        </div>
+        <div class="vs-grid reveal">
+          <div class="vs-col vs-human">
+            <div class="vs-head"><span class="vs-icon">✕</span><h3>情绪驱动的手动交易</h3></div>
+            <ul>
+              <li>追涨杀跌，被恐惧与贪婪牵着走</li>
+              <li>无法 24 小时盯盘，错过关键时机</li>
+              <li>亏损后报复性加仓，越亏越重</li>
+              <li>决策全凭感觉，无法回测验证</li>
+            </ul>
+          </div>
+          <div class="vs-divider"><span>VS</span></div>
+          <div class="vs-col vs-algo">
+            <div class="vs-head"><span class="vs-icon">✓</span><h3>纪律执行的算法交易</h3></div>
+            <ul>
+              <li>规则化执行，每一单都有数学依据</li>
+              <li>EA 全天候运行，毫秒级响应行情</li>
+              <li>多重风控自动触发，回撤始终可控</li>
+              <li>回测 + 实盘双重验证，表现可追溯</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 核心理念 -->
+    <section class="section" id="philosophy">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">PHILOSOPHY</div>
+          <h2>我们的核心理念<span class="en">FIVE WAVELENGTHS OF PRISM X</span></h2>
+          <p>白光经过棱镜被分解为五种波长 —— 这是我们做量化的五个基本面。</p>
+        </div>
+
+        <div class="phil-screens">
+
+          <article class="phil-screen reveal" data-hue="0">
+            <div class="phil-screen-inner">
+              <svg class="phil-letter" viewBox="0 0 300 240" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><text class="phil-letter-text" x="4" y="192" font-size="220">P</text></svg>
+              <span class="phil-wave">λ-01 / 380nm · 核心理念 01</span>
+              <h3 class="phil-title">Precision<span class="cn">精准</span></h3>
+              <p class="phil-lead">光线通过棱镜的精确折射，我们将复杂的市场数据转化为精准的交易信号。每一个策略参数都经过严格的数学验证和实盘检验。</p>
+              <div class="phil-points">
+                <div class="phil-point"><h4>5年深度研发</h4><span>持续的策略优化和参数调校，确保每个交易决策的精确性</span></div>
+                <div class="phil-point"><h4>9年经验积累</h4><span>丰富的市场经验转化为精确的风险控制和机会识别</span></div>
+                <div class="phil-point"><h4>严格回测验证</h4><span>每个策略都经过历史数据的严格测试和验证</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="phil-screen reveal" data-hue="1">
+            <div class="phil-screen-inner">
+              <svg class="phil-letter" viewBox="0 0 300 240" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><text class="phil-letter-text" x="4" y="192" font-size="220">R</text></svg>
+              <span class="phil-wave">λ-02 / 420nm · 核心理念 02</span>
+              <h3 class="phil-title">Risk-First<span class="cn">风险优先</span></h3>
+              <p class="phil-lead">“风险第一，收益第二”是我们不变的投资哲学。就像棱镜能够分离有害紫外线，我们的系统能够识别和规避市场风险。</p>
+              <div class="phil-points">
+                <div class="phil-point"><h4>多重风控机制</h4><span>时间风控、解套算法、人工监控三重保护</span></div>
+                <div class="phil-point"><h4>透明风险展示</h4><span>真实展示包括回撤在内的完整交易表现</span></div>
+                <div class="phil-point"><h4>快速应对机制</h4><span>基于5年优化的风险应对和处置流程</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="phil-screen reveal" data-hue="2">
+            <div class="phil-screen-inner">
+              <svg class="phil-letter" viewBox="0 0 300 240" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><text class="phil-letter-text" x="4" y="192" font-size="220">I</text></svg>
+              <span class="phil-wave">λ-03 / 460nm · 核心理念 03</span>
+              <h3 class="phil-title">Intelligence<span class="cn">智能</span></h3>
+              <p class="phil-lead">运用人工智能和算法交易技术，持续优化和研发策略，让每一笔交易都在最优时机执行。</p>
+              <div class="phil-points">
+                <div class="phil-point"><h4>EA自动化交易</h4><span>24小时不间断的智能交易执行系统</span></div>
+                <div class="phil-point"><h4>AI优化策略</h4><span>利用现有的科技，不断优化，改进我们的策略</span></div>
+                <div class="phil-point"><h4>持续算法优化</h4><span>每段时间定期优化参数，确保能够符合市场行情</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="phil-screen reveal" data-hue="3">
+            <div class="phil-screen-inner">
+              <svg class="phil-letter" viewBox="0 0 300 240" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><text class="phil-letter-text" x="4" y="192" font-size="220">S</text></svg>
+              <span class="phil-wave">λ-04 / 500nm · 核心理念 04</span>
+              <h3 class="phil-title">Stability<span class="cn">稳健</span></h3>
+              <p class="phil-lead">稳健是我们的核心特质。我们测试策略都会先关注策略的稳定性，确保可以在不同的市场环境存活。</p>
+              <div class="phil-points">
+                <div class="phil-point"><h4>低风险策略开发</h4><span>持续开发以“稳定”为主的EA</span></div>
+                <div class="phil-point"><h4>收益风险平衡</h4><span>比起收益率，我们更加优先考虑回撤</span></div>
+                <div class="phil-point"><h4>长期实盘验证</h4><span>所有策略都经过充分的实盘测试</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="phil-screen reveal" data-hue="4">
+            <div class="phil-screen-inner">
+              <svg class="phil-letter" viewBox="0 0 300 240" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><text class="phil-letter-text" x="4" y="192" font-size="220">M</text></svg>
+              <span class="phil-wave">λ-05 / 540nm · 核心理念 05</span>
+              <h3 class="phil-title">Multi-Strategy<span class="cn">多策略</span></h3>
+              <p class="phil-lead">就像棱镜将白光分解为丰富的光谱，我们提供多元化的量化策略，满足不同投资者的风险偏好和收益期望。</p>
+              <div class="phil-points">
+                <div class="phil-point"><h4>高回报</h4><span>适合风险偏好者，绝对可以满足你的冒险精神</span></div>
+                <div class="phil-point"><h4>高稳定</h4><span>适合追求长期的投资者，以稳定为第一需求</span></div>
+                <div class="phil-point"><h4>更多策略研发中</h4><span>持续开发适应不同市场环境的量化策略</span></div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 团队介绍 / 时间线 -->
+    <section class="section" id="timeline">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">TIMELINE</div>
+          <h2>团队介绍<span class="en">2017 — 2026 · THE PATH OF PRISM X</span></h2>
+          <p>从算法交易的探索者，到旗舰级量化产品的构建者。</p>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-year">2017</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>团队成立</h3>
+              <p>“棱镜量化”团队正式成立并进军全球交易市场。我们便深信：情绪化和不确定性是手动交易的最大瓶颈。由此，我们踏上了用“算法交易”解决“人性”弱点的探索之路，并构建了一个算法交易策略库。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2019</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>策略整合</h3>
+              <p>从深入到精益求精，我们整合了大量华尔街的算法交易策略，并吸纳了全球顶级量化机构的风控、算法精髓等丰富经验。不仅更加完善了我们的算法交易策略库，并建立了一套高级别的风控体系，以加强策略的续航能力。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2021</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>策略升级</h3>
+              <p>融合了我们的交易哲学，并加入了“滚动优化”、“动态风控”模块。开发出一套算法交易策略，以非常强的风险管理能力在市场剧烈波动时，赚取更丰厚的收益。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2023</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>团队升级</h3>
+              <p>“棱镜量化”团队汇集了金融建模、软件开发和大数据分析各领域的成员。我们齐心协力，借助AI进一步升级优化算法交易策略库，让工具更加智能化，升级为可商业化的旗舰级产品 —— 既有程序化算法交易策略，也有智能可视化的行情分析软件。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2024</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>实战验证</h3>
+              <p>算法力量在实战中不断得到验证。我们的算法交易策略在过去一年中，成功地在各类市场环境下保持稳定盈利。年化收益率远超行业平均水平，最大回撤更是控制在安全线以内，完美兑现了我们最初的设计理念，确保了风险和收益的平衡。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2025</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>持续拓展</h3>
+              <p>我们将持续拓展策略边界，开发针对不同市场周期的多元化算法交易EA矩阵，并以滚动优化机制确保所有产品始终保持最佳性能，致力于为客户带来卓越且长期的投资价值。</p>
+            </div></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-year">2026</div>
+            <div class="tl-node"></div>
+            <div class="tl-content"><div class="tl-card">
+              <h3>透明化运营</h3>
+              <p>上线"账户追踪"体系，实盘账户的收益、回撤与运行状态公开呈现，让每一份信任都建立在真实数据之上。EA 矩阵与可视化分析工具持续迭代，以长期主义服务全球投资者。</p>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 账户追踪 -->
+    <section class="section" id="accounts">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">LIVE ACCOUNTS</div>
+          <h2>账户追踪<span class="en">REAL ACCOUNTS · REAL NUMBERS</span></h2>
+          <p>这里展示我们目前在运行的交易账户数据和介绍。我们坚持透明风险展示 —— 包括回撤在内的完整交易表现。</p>
+        </div>
+        <div class="accounts-grid" id="accountsGrid">
+          <!-- 由 js/main.js 渲染 -->
+        </div>
+        <p class="accounts-note">历史表现不代表未来收益</p>
+        <div class="accounts-cta reveal">
+          <a class="btn btn-primary" href="#how">看完数据 · 了解如何参与</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 如何开始（降低门槛 · 路径清晰 · 不催促） -->
+    <section class="section" id="how">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">HOW IT WORKS</div>
+          <h2>如何开始<span class="en">THREE STEPS TO BEGIN</span></h2>
+          <p>透明、可控、不催促 —— 先了解，再决定。</p>
+        </div>
+        <div class="steps reveal">
+          <div class="step">
+            <div class="step-n">STEP 01</div>
+            <h3>了解与咨询</h3>
+            <p>查看我们公开的实盘账户与策略说明，带着你的问题与我们沟通，确认风险与收益预期是否与你匹配。</p>
+          </div>
+          <div class="step">
+            <div class="step-n">STEP 02</div>
+            <h3>开通你自己的账户</h3>
+            <p>在受监管的经纪商开通<strong>属于你本人</strong>的交易账户，资金始终由你本人掌控，按说明接入对应策略 / EA。</p>
+          </div>
+          <div class="step">
+            <div class="step-n">STEP 03</div>
+            <h3>跟踪与复盘</h3>
+            <p>通过账户追踪实时查看收益与回撤并定期复盘，任何阶段你都可随时调整或停止。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 行动召唤 -->
+    <section class="section cta-section" id="contact">
+      <div class="section-inner cta-inner reveal">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="cta-left">
+          <div class="section-tag">CONTACT</div>
+          <h2>让算法替你保持纪律</h2>
+          <p>先看完我们正在运行的真实账户 —— 包括回撤在内的完整表现，<br class="cta-br" />再决定是否与我们同行。我们不催你,只把数据和风险摆清楚。</p>
+          <div class="cta-actions">
+            <a class="btn btn-primary btn-lg" href="#accounts">查看实盘账户</a>
+            <a class="btn btn-ghost" href="#faq">先看常见问题</a>
+          </div>
+          <div class="cta-trust">
+            <span>✓ 透明回撤展示</span>
+            <span>✓ 资金自己掌控</span>
+            <span>✓ 风险优先哲学</span>
+          </div>
+        </div>
+        <div class="cta-right">
+          <div class="contact-methods">
+            <a class="contact-card" href="https://wa.me/601156985605" target="_blank" rel="noopener noreferrer">
+              <span class="cc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21L4.65 17.15C3.67 15.59 3.05 13.87 3.05 12.05C3.05 6.59 7.59 2.05 13.05 2.05C18.51 2.05 23.05 6.59 23.05 12.05C23.05 17.51 18.51 22.05 13.05 22.05C11.23 22.05 9.51 21.43 7.95 20.45L3 21Z"/><path d="M8.8 9.5C9.2 8.3 10.2 8 11 8.3C11.4 8.5 11.7 8.9 12 9.3C12.6 10.4 13 11 12.5 12C12.5 12 11.5 13.2 11.5 13.2C12.5 15 14 15.8 16 16.5C16 16 17 15 17.2 14.5C17.5 14 17 13.5 16 13C15.6 12.8 14.5 12.4 14 12.5C13.5 12.6 12.5 13.8 11.8 14.2C11.1 14.6 10 14 8.8 12.5C7.6 11 7.5 10.2 8.8 9.5Z"/></svg></span>
+              <span>WhatsApp <b>+60 11-56985605</b></span>
+            </a>
+            <a class="contact-card" href="weixin://contacts/profile/rexlee8698">
+              <span class="cc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 11C8.5 8.5 10.5 6.5 13 6.5C15.5 6.5 17.5 8.5 17.5 11C17.5 13.5 15.5 15.5 13 15.5H11L8 18V15.5C7 14.5 6.5 13 6.5 11.5"/><circle cx="11" cy="11" r="1.2"/><circle cx="15" cy="11" r="1.2"/></svg></span>
+              <span>微信 <b>rexlee8698</b></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 常见问题（正面回答入金前的核心顾虑） -->
+    <section class="section section-tight" id="faq">
+      <div class="section-inner">
+        <div class="section-head reveal">
+          <div class="section-tag">FAQ</div>
+          <h2>常见问题<span class="en">QUESTIONS BEFORE YOU START</span></h2>
+          <p>把入金前最该问的问题，老老实实摆在这里。</p>
+        </div>
+        <div class="faq reveal" id="faqList">
+          <!-- 由 js/main.js 渲染 -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a class="brand" href="#top">
+        <span class="brand-name">PRISM <em>X</em></span>
+        <span class="brand-cn">棱镜量化</span>
+      </a>
+      <p>© 2017 – 2026 PRISM X Quantitative. All rights reserved.</p>
+    </div>
+    <p class="footer-disclaimer">
+      风险提示：本网站内容仅作团队与策略介绍之用，不构成任何投资建议。量化交易及外汇、差价合约等杠杆产品存在较高风险，可能导致本金损失。历史表现不代表未来收益，请根据自身风险承受能力谨慎决策。
+    </p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    /* 连续点击 phil-wave 5 次显示管理入口 */
+    (function () {
+      var clicks = 0;
+      var timer = null;
+      var philWave = document.querySelector('.phil-wave');
+      var adminLink = document.querySelector('.nav-admin');
+      if (!philWave || !adminLink) return;
+      philWave.style.cursor = 'default';
+      philWave.addEventListener('click', function () {
+        clicks++;
+        clearTimeout(timer);
+        if (clicks >= 5) {
+          adminLink.classList.remove('hidden');
+          clicks = 0;
+        } else {
+          timer = setTimeout(function () { clicks = 0; }, 2000);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
