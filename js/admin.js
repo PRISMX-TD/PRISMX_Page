@@ -415,7 +415,7 @@ document.getElementById("ghSaveTokenBtn").addEventListener("click", function () 
 });
 
 document.getElementById("ghClearTokenBtn").addEventListener("click", function () {
-  sessionStorage.removeItem(GH_TOKEN_KEY);
+  localStorage.removeItem(GH_TOKEN_KEY);
   updateGitHubTokenStatus();
   showToast("Token 已清除");
 });
