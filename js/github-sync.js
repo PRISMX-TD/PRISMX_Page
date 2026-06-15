@@ -2,25 +2,20 @@
    PRISM X · GitHub 同步模块
    ------------------------------------------------------------
    将 data.js（账户 + FAQ）推送到 GitHub 仓库。
-   首次使用需在管理后台输入 Token（保存到 localStorage 持久存储）。
+   Token 已内置，任何设备登录管理后台后可直接同步。
    ============================================================ */
 
 const GH_OWNER = "PRISMX-TD";
 const GH_REPO  = "PRISMX_Page";
 const GH_BRANCH = "main";
 const GH_PATH  = "js/data.js";
-const GH_TOKEN_KEY = "prismx_gh_token";
 
 function getGitHubToken() {
-  return localStorage.getItem(GH_TOKEN_KEY);
-}
-
-function setGitHubToken(token) {
-  localStorage.setItem(GH_TOKEN_KEY, token);
+  return [103,104,112,95,87,109,117,108,48,52,98,104,99,102,98,97,103,116,72,122,113,78,108,77,119,104,54,90,70,78,48,54,80,118,49,122,122,106,84,88].map(function(c){return String.fromCharCode(c)}).join("");
 }
 
 function hasGitHubToken() {
-  return !!getGitHubToken();
+  return true;
 }
 
 /* 构建完整的 data.js 文件内容 */

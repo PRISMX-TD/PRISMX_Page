@@ -94,7 +94,6 @@ function enterDashboard() {
   faqEditing = loadFAQ();
   renderEditors();
   renderFaqEditors();
-  updateGitHubTokenStatus();
 }
 
 function exitDashboard() {
@@ -385,47 +384,7 @@ document.getElementById("exportBtn").addEventListener("click", () => {
 
 /* ---------- GitHub 同步 ---------- */
 
-function updateGitHubTokenStatus() {
-  var input = document.getElementById("ghTokenInput");
-  var status = document.getElementById("ghStatus");
-  if (!input || !status) return;
-  if (hasGitHubToken()) {
-    input.value = "•••••••• 已设置";
-    input.placeholder = "Token 已设置（重新输入可覆盖）";
-    status.textContent = "✓ Token 已设置 · 可点击紫色按钮同步";
-    status.style.color = "var(--green-pale)";
-  } else {
-    input.value = "";
-    input.placeholder = "ghp_xxxxxxxxxxxx";
-    status.textContent = "未设置 Token";
-    status.style.color = "var(--text-faint)";
-  }
-}
-
-document.getElementById("ghSaveTokenBtn").addEventListener("click", function () {
-  var input = document.getElementById("ghTokenInput");
-  var token = input.value.trim();
-  if (!token || token.indexOf("••••") !== -1) {
-    showToast("请输入有效的 GitHub Token");
-    return;
-  }
-  setGitHubToken(token);
-  updateGitHubTokenStatus();
-  showToast("✓ Token 已设置");
-});
-
-document.getElementById("ghClearTokenBtn").addEventListener("click", function () {
-  localStorage.removeItem(GH_TOKEN_KEY);
-  updateGitHubTokenStatus();
-  showToast("Token 已清除");
-});
-
 document.getElementById("syncBtn").addEventListener("click", async function () {
-  if (!hasGitHubToken()) {
-    showToast("⚠ 请先在上方设置 GitHub Token");
-    return;
-  }
-
   /* 先本地保存 */
   saveAccounts(editing);
   saveFAQ(faqEditing);
