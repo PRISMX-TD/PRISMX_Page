@@ -1,11 +1,11 @@
 /* ============================================================
    PRISM X · 数据（由管理控制台导出）
-   导出时间：6/16/2026, 10:30:19 AM
-   数据版本：2
+   导出时间：6/18/2026, 5:11:06 PM
+   数据版本：3
    本文件由管理后台自动推送至 GitHub。
    ============================================================ */
 
-const DATA_VERSION = 2;
+const DATA_VERSION = 3;
 const PRISM_STORAGE_KEY = "prismx_accounts_v1";
 
 const DEFAULT_ACCOUNTS = [
@@ -30,7 +30,7 @@ const DEFAULT_ACCOUNTS = [
     "status": "running",
     "broker": "Make Capital",
     "startDate": "2024-03-13",
-    "balance": "137488",
+    "balance": "138245",
     "totalReturn": 71.15,
     "annualReturn": "",
     "maxDrawdown": 7.88,
